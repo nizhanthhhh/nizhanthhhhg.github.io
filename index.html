@@ -1,0 +1,684 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HU1008 Life Skills - Adaptive MCQ Bank (Shuffled Options)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    transition: background 0.2s, color 0.2s;
+  }
+  body.dark {
+    background: #0f172a;
+    color: #e2e8f0;
+  }
+  header {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  body.dark header {
+    background: #1e293b;
+    border-color: #334155;
+  }
+  header h1 { font-size: 1.2rem; font-weight: 700; }
+  .header-btns { display: flex; gap: 8px; }
+  button {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #222;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  body.dark button {
+    background: #334155;
+    border-color: #475569;
+    color: #e2e8f0;
+  }
+  button:hover { background: #e9ecef; transform: translateY(-1px); }
+  .container { max-width: 950px; margin: 0 auto; padding: 20px; }
+  .unit-tabs { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .unit-btn {
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #ddd;
+    cursor: pointer;
+  }
+  .unit-btn.active { background: #4a90e2; border-color: #4a90e2; color: #fff; }
+  .scores { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .score-box {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  body.dark .score-box { background: #1e293b; border-color: #334155; }
+  .score-box span { font-weight: 800; color: #4a90e2; font-size: 16px; }
+  .q-area {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  body.dark .q-area { background: #1e293b; border-color: #334155; }
+  .placeholder { text-align: center; color: #888; padding: 60px 20px; font-size: 16px; }
+  .progress-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; color: #666; }
+  .progress-bar-bg { height: 6px; background: #e0e0e0; border-radius: 99px; margin-bottom: 20px; overflow: hidden; }
+  body.dark .progress-bar-bg { background: #334155; }
+  .progress-bar-fill { height: 100%; background: #4a90e2; border-radius: 99px; transition: width 0.3s; }
+  .q-number { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .q-text { font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fafafa;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: left;
+    line-height: 1.45;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  body.dark .opt { background: #0f172a; border-color: #334155; }
+  .opt:hover:not(:disabled) { background: #eef4fd; border-color: #4a90e2; }
+  .opt:disabled { cursor: default; opacity: 0.8; }
+  .opt-letter {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    background: #e8e8e8;
+    font-size: 13px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+  }
+  body.dark .opt-letter { background: #334155; color: #cbd5e1; }
+  .opt.correct { background: #eafaf1; border-color: #27ae60; }
+  .opt.correct .opt-letter { background: #27ae60; color: #fff; }
+  .opt.wrong { background: #fdf0f0; border-color: #e74c3c; }
+  .opt.wrong .opt-letter { background: #e74c3c; color: #fff; }
+  .feedback {
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #eafaf1; color: #1e8449; border-left: 4px solid #27ae60; }
+  .feedback.wrong { background: #fdf0f0; color: #c0392b; border-left: 4px solid #e74c3c; }
+  .nav-row { display: flex; justify-content: space-between; gap: 12px; }
+  .nav-row button { padding: 8px 20px; }
+  .nav-btn-primary { background: #4a90e2 !important; border-color: #4a90e2 !important; color: #fff !important; }
+  .q-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+  }
+  body.dark .q-nav { border-bottom-color: #334155; }
+  .q-nav-dot {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: #e8e8e8;
+    border: 1px solid #ccc;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  body.dark .q-nav-dot { background: #334155; border-color: #475569; color: #cbd5e1; }
+  .q-nav-dot:hover { transform: scale(1.05); border-color: #4a90e2; }
+  .q-nav-dot.current { border-color: #4a90e2; background: #eef4fd; color: #4a90e2; }
+  .q-nav-dot.done-c { background: #eafaf1; border-color: #27ae60; color: #1e8449; }
+  .q-nav-dot.done-w { background: #fdf0f0; border-color: #e74c3c; color: #c0392b; }
+  @media (max-width: 600px) {
+    .container { padding: 12px; }
+    .q-area { padding: 16px; }
+    .q-text { font-size: 14px; }
+    .q-nav-dot { width: 28px; height: 28px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📘 HU1008 Life Skills for Engineers - Adaptive MCQ Bank</h1>
+  <div class="header-btns">
+    <button onclick="toggleDark()">🌙 Dark Mode</button>
+    <button onclick="resetUnit()">↺ Reset Current Unit</button>
+    <button onclick="reshuffleAllQuestions()">🔄 Shuffle All Options</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="unit-tabs">
+    <button class="unit-btn" onclick="switchUnit(0)">📖 Unit 1 (100 Qs)</button>
+    <button class="unit-btn" onclick="switchUnit(1)">🎯 Unit 2 (90 Qs)</button>
+    <button class="unit-btn" onclick="switchUnit(2)">🤝 Unit 3 (60 Qs)</button>
+  </div>
+
+  <div class="scores">
+    <div class="score-box">✅ Unit 1: <span id="s0">0</span> / <span id="t0">0</span></div>
+    <div class="score-box">✅ Unit 2: <span id="s1">0</span> / <span id="t1">0</span></div>
+    <div class="score-box">✅ Unit 3: <span id="s2">0</span> / <span id="t2">0</span></div>
+  </div>
+
+  <div class="q-area" id="q-area">
+    <p class="placeholder">👆 Select a unit to begin practicing ALL MCQs.</p>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// ORIGINAL QUESTION BANK (BASED ON PDF)
+// ============================================================
+
+// ----- UNIT 1 (100 Questions) -----
+const RAW_UNIT1 = [
+  { text:"…………………… are defined as psychological abilities for adaptive and positive behaviors.", opts:["Life skills","Recreational skills","Soft skills","Vocational skills"], correct:0 },
+  { text:"The values of life skills include:", opts:["All of these","Concerned about the welfare of others","Capable of having an influence on the world","Aware of their rights and responsibilities"], correct:0 },
+  { text:"…………………… defined as the feeling of pity and sorrow for someone else's misfortune:", opts:["Sympathy","Empathy","Values","Courtesy"], correct:0 },
+  { text:"Which term refers to relationships or communication that occurs between two or more people?", opts:["Interpersonal","Intra-personal","Intimate","Cordial"], correct:0 },
+  { text:"…………………… refers to the ability to recognize, understand, and manage one's own emotions as well as the emotions of others.", opts:["EQ","SQ","IQ","PQ"], correct:0 },
+  { text:"…………… are activities structured to feel like real experiences?", opts:["Simulations","Communication","Drama","Skills"], correct:0 },
+  { text:"………… method is used to enhance life skills.", opts:["Audio-visual activities","Stress","Self-unawareness","MBIT"], correct:0 },
+  { text:"Critical thinking requires basic qualities such as:", opts:["All of these","Flexibility","Persistence","Open-mindedness"], correct:0 },
+  { text:"The life skills approach encompasses and balances all three components, namely Knowledge, Skills and _______.", opts:["Attitudes","Empathy","Sympathy","Apathy"], correct:0 },
+  { text:"…….. is a novel way of seeing or doing things that generates new ideas, has a shifting perspective, conceives something new, and builds on other ideas.", opts:["Critical thinking","Creative thinking","Self-awareness","Sympathy"], correct:1 },
+  { text:"…….. is the translation of the German term Einfühlung, meaning, 'to feel as one with'.", opts:["Empathy","Sympathetic","Sympathy","Empathetic"], correct:0 },
+  { text:"According to Daniel Goleman, '……………… is a master aptitude, a capacity that profoundly affects all other abilities, either facilitating or interfering.'", opts:["Emotional intelligence","Creative thinking","Interpersonal Skills","Critical thinking"], correct:0 },
+  { text:"…….. skills are important for relating positively with people we interact with.", opts:["Interpersonal Skills","Creative thinking","Critical thinking","Empathy"], correct:0 },
+  { text:"Determining alternative solutions to a problem is related to …………… skill.", opts:["Problem solving skills","Refusal skills","Critical thinking","Effective communication skill"], correct:0 },
+  { text:"Life skills help people establish productive ………………………. relationships.", opts:["Interpersonal","Social","Cultural","Personal"], correct:0 },
+  { text:"An individual must be able to evaluate the future consequences of their present actions. This is an example of ………… skill.", opts:["Critical thinking skill","Inter-personal skill","Communication skill","None of these"], correct:0 },
+  { text:"……………… skill includes the verbal and non-verbal aspects.", opts:["Communication","Advocacy","Decision making","Problem solving"], correct:0 },
+  { text:"What term best describes a person who recognizes and believes in their own worth and abilities?", opts:["Self-confidence","Self-worth","Self-evaluation","Self-knowledge"], correct:0 },
+  { text:"Life skill education provides a foundation for adults' ………. behavior.", opts:["Social","Psychological","Economic","Cultural"], correct:0 },
+  { text:"Self-evaluation skills help to set…………", opts:["Goals","Career","Education","Family"], correct:0 },
+  { text:"Development of life skills enables the adolescent to be ………………… in society.", opts:["Accepted","Passive","Active","Rejected"], correct:0 },
+  { text:"Ability to express feelings and provide feedback is related to …………… skills.", opts:["Interpersonal skill","Management skill","Motivational skill","Decision-making skill"], correct:0 },
+  { text:"Active listening is an example of ……. ability.", opts:["Interpersonal","Cultural","Personal","Social"], correct:0 },
+  { text:"Positive thinking will help to manage ………………...", opts:["Stress","Super Ego","Happiness","We-feeling"], correct:0 },
+  { text:"……….. focuses not only on knowledge and attitude change but, more importantly, on behavior change.", opts:["Life skill education","Formal education","Informal education","Adult education"], correct:0 },
+  { text:"Which of the following refers to abilities that support adaptive and positive behavior?", opts:["Thinking","Attitude","Creativity","Life skills"], correct:3 },
+  { text:"Critical thinking means………..", opts:["Higher level thinking that aims to solve a problem","Logically analyzing arguments","Finding faults in others' arguments","Disciplined thinking and judgment"], correct:0 },
+  { text:"According to Hoffman, everyone is born with the capability of feeling ……...", opts:["Pain","Sorrow","Empathy","Entertainment"], correct:2 },
+  { text:"Ability to perceive the visual:", opts:["Pictures","Visual intelligence","See","Hear"], correct:1 },
+  { text:"……… the ability to use words and language.", opts:["Elegancy","Verbal intelligence","Adequacy","Critical thinking"], correct:1 },
+  { text:"Thinking about other things while listening to others is called ……………………….", opts:["Mind drift","Inactive listening","Listening mistake","Passive listening"], correct:0 },
+  { text:"…………………… helps to capture the listener's attention.", opts:["Gesture","Communication","Message","Hints"], correct:0 },
+  { text:"Listening skills are a prerequisite for ………………...", opts:["Group discussion","Intra Personal Communication","Speaking","Public discussion"], correct:0 },
+  { text:"………………….. is a conversation between two people.", opts:["Dialogue","Debate","Discussion","Monologue"], correct:0 },
+  { text:"The term 'self-esteem' comes from a ……………….. word.", opts:["Greek","French","Latin","Portuguese"], correct:0 },
+  { text:"………………….. means pride in one's self-respect.", opts:["Self-esteem","Self-appraisal","Self-awareness","Self-confidence"], correct:0 },
+  { text:"………………….. is a clear perception of your personality.", opts:["Awareness","Assessment","Identity","Control"], correct:0 },
+  { text:"……………………. an ability to observe one's behavior, action, thoughts, feelings and emotions.", opts:["Self-awareness","Self-identification","Self-evaluation","Self-assessment"], correct:0 },
+  { text:"It is otherwise called self-discipline.", opts:["Self-control","Self-identity","Self-evaluation","Self-assessment"], correct:0 },
+  { text:"…………………….. is internal processes that activate, guide, and maintain behavior.", opts:["Motivation","Emotion","Hard work","Goal attainment"], correct:0 },
+  { text:"The word SQ (Social Quotient) is originally coined by …………………..", opts:["Edward Thorndike","Ketron Aura","Robert Sternberg","Steven Vernon"], correct:0 },
+  { text:"Time management is ………………..", opts:["Planning how to divide time between activities","Arranging appointments","Completing tasks quickly","Setting strict schedules"], correct:0 },
+  { text:"Time management is important because ………………….", opts:["It reduces stress and improves productivity","It helps avoid work","Allows long hours without breaks","Ensures no errors"], correct:0 },
+  { text:"First step in effective time management is …………………….", opts:["Identifying your goals","Making a to-do list","Prioritizing tasks","Setting deadlines"], correct:0 },
+  { text:"………………….. is an example of a time-wasting activity.", opts:["Attending unnecessary meetings","Taking breaks","Checking emails at designated times","Prioritizing tasks"], correct:0 },
+  { text:"How can you prioritize tasks effectively?", opts:["By complexity","By order received","By urgency and importance","By ease of completion"], correct:2 },
+  { text:"How can saying 'no' help with time management?", opts:["Focus on own priorities","Avoid all commitments","Prevent new responsibilities","Increase stress"], correct:0 },
+  { text:"What is the purpose of setting deadlines?", opts:["Create urgency","Complete quickly","Allow flexibility","Measure productivity"], correct:0 },
+  { text:"Which is an example of multitasking?", opts:["Working on multiple tasks simultaneously","One task at a time","Two tasks sequentially","Juggling with no order"], correct:0 },
+  { text:"How can you avoid procrastination?", opts:["Break tasks into smaller steps","Set unrealistic deadlines","Take frequent breaks","Avoid to-do lists"], correct:0 },
+  { text:"What is the purpose of time blocking?", opts:["Allocate specific time slots","Eliminate distractions","Work without breaks","Limit daily tasks"], correct:0 },
+  { text:"What is the goal of time management?", opts:["Make most of available time","Make time go faster","Complete tasks quickly","Eliminate breaks"], correct:0 },
+  { text:"How can delegating tasks help?", opts:["Free time for higher-priority tasks","Procrastinate","Avoid prioritization","Reduce workload"], correct:0 },
+  { text:"What is the purpose of time management tools?", opts:["Track and manage tasks efficiently","Eliminate deadlines","Reduce productivity","Replace prioritization"], correct:0 },
+  { text:"Which is an external time-wasting factor?", opts:["Frequent interruptions","Procrastination","Unrealistic goals","Using techniques"], correct:0 },
+  { text:"Which is an internal time-wasting factor?", opts:["Procrastinating on tasks","Setting realistic deadlines","Prioritizing tasks","Using techniques"], correct:0 },
+  { text:"How can time management reduce stress?", opts:["Plan and prioritize tasks","Increase workload","Allow more breaks","Create pressure"], correct:0 },
+  { text:"Pareto Principle purpose?", opts:["Identify most critical tasks","Focus only on urgent tasks","Allocate by complexity","Achieve 100% productivity"], correct:0 },
+  { text:"How do realistic deadlines help?", opts:["Create urgency","Ensure quick completion","Allow flexibility","Eliminate prioritization"], correct:0 },
+  { text:"Which technique divides workday into blocks?", opts:["Time blocking","Pareto Principle","ABCD Method","Pomodoro"], correct:0 },
+  { text:"Why avoid overloading schedule?", opts:["Reduces stress and burnout","Allows more breaks","Ensures timely completion","Eliminates prioritization"], correct:0 },
+  { text:"ABCD Method purpose?", opts:["Categorize by urgency/importance","Prioritize by complexity","Eliminate low-priority","Complete simultaneously"], correct:0 },
+  { text:"How does time management improve work-life balance?", opts:["More leisure time","Increase work hours","Reduce tasks","Eliminate prioritization"], correct:0 },
+  { text:"Main benefit of time management techniques?", opts:["Increases productivity","Eliminates prioritization","Reduces deadlines","Identifies waste"], correct:0 },
+  { text:"Purpose of setting specific goals?", opts:["Focus efforts and prioritize","Create endless list","Track achievements","Allocate time"], correct:0 },
+  { text:"How does time management help with deadlines?", opts:["Creates urgency","Avoids commitments","Sets unrealistic deadlines","Multitasking"], correct:0 },
+  { text:"Personality disorders common features?", opts:["All of these","Enduring pattern of behavior","Unusual interpretation of events","Impairments in functioning"], correct:0 },
+  { text:"Narcissistic personality disorder tendency?", opts:["Pervasive need for admiration","Inability to monitor reality","Impulsive behavior","Unusual ideas of reference"], correct:0 },
+  { text:"Antisocial PD impulsive behavior due to?", opts:["Dysfunctional schemas","Dysfunctional memories","Dysfunctional hearing","Dysfunctional balance"], correct:0 },
+  { text:"Borderline PD impulsive behavior brain area?", opts:["Dopamine","Circuitry","Anatomy","Corpus callosum"], correct:0 },
+  { text:"World Health Day celebrated on?", opts:["7th April","1st March","6th October","10th December"], correct:0 },
+  { text:"Cleanliness, exercise, rest are part of?", opts:["Personal hygiene","Hygiene","Social hygiene","None"], correct:0 },
+  { text:"Which is an unhealthy habit?", opts:["Eating without washing hands","Sharing food","Bathing twice daily","Drinking boiled water"], correct:0 },
+  { text:"Which is not a bacterial disease?", opts:["All of these (AIDS, Dengue, Measles)","AIDS","Dengue","Measles"], correct:0 },
+  { text:"Which disease is 'Salmonella enterica serotype Typhi'?", opts:["Typhoid","Malaria","Diarrhea","Yellow fever"], correct:0 },
+  { text:"Main cause of Hepatitis transmission?", opts:["Sharing drug needles","Mosquito bite","Contaminated water","All of these"], correct:3 },
+  { text:"True about contamination?", opts:["Entry of germs into drinking water/food","Entry by insect bite","Entry by animal bite","None"], correct:0 },
+  { text:"Which disease is not caused by bacteria?", opts:["Poliomyelitis","Typhoid","Tuberculosis","All of these"], correct:0 },
+  { text:"Main cause of contagious disease?", opts:["All of these","Contaminated air","Contaminated food","Poor hygiene"], correct:0 },
+  { text:"Factors necessary for good health?", opts:["All of these","Vaccination","Balanced diet","Personal hygiene"], correct:0 },
+  { text:"Which substance causes increased fat synthesis, blood vessel dilation, low blood sugar?", opts:["Drug addiction/tobacco","Alcohol","Tobacco","Drug addiction"], correct:1 },
+  { text:"…………………. causes tunnel vision.", opts:["Alcohol","Smoking","Barbiturates","Vitamin A deficiency"], correct:0 },
+  { text:"Which consumed after alcohol can lead to death?", opts:["Barbiturate","Morphine","Opium","All of these"], correct:3 },
+  { text:"Which drug with alcohol causes drowsiness but no sedative effect?", opts:["Antihistamine","Marijuana","Valium","Barbiturate"], correct:0 },
+  { text:"Constituent of alcoholic beverage?", opts:["Ethyl alcohol","Propyl alcohol","Methyl alcohol","Mix of all"], correct:0 },
+  { text:"…………………. is a result of fatty liver syndrome.", opts:["Synthesis of fat from alcohol","Synthesis of fatty acids","Synthesis from amino acids","Excessive synthesis"], correct:0 },
+  { text:"…………………. condition from alcoholism causing fatty acid accumulation in liver.", opts:["Cirrhosis","Neuritis","Gastritis","Nephritis"], correct:0 },
+  { text:"…………………. is a withdrawal symptom of alcohol.", opts:["Nausea/vomiting","Delirium","Swollen patchy face","All of these"], correct:3 },
+  { text:"…………………. causes highest fat accumulation in liver.", opts:["Alcohol","Meat and egg","Saturated fat","Starch"], correct:0 },
+  { text:"Consequence of alcohol addiction?", opts:["Cardiovascular diseases, hypertension, fatty liver","Psychosis, hypertension, fatty liver","Ulcers, mental illness, vitamin deficiency","All of these"], correct:3 },
+  { text:"ICT contribution in education?", opts:["Easy access to learning","Easy access to teaching","Easy access to workloads","Easy access to books"], correct:0 },
+  { text:"Which tool is NOT associated with ICT?", opts:["Laboratories","Calculation","Slideshow","Video"], correct:0 },
+  { text:"To remain competitive in ICT, leader must keep pace with?", opts:["Updated technology","Creation","Skill","Knowledge"], correct:0 },
+  { text:"____________ is a form of marketing communication to persuade action.", opts:["Advertising","Viral video","Mass media","Social networking"], correct:0 },
+  { text:"'Information overload' refers to?", opts:["Brain processing more details than can handle","Reaction to breaking news","Access to various media","Hearing something disliked"], correct:0 },
+  { text:"Common effect of information overload?", opts:["Brain becomes fatigued and unfocused","Withdraw from data","Only process facts","Brain speeds up"], correct:0 },
+  { text:"How have information age and digital technologies contributed?", opts:["Access to more forms of data","Limited ability to find data","Stopped all forms of overload","No bearing"], correct:0 },
+  { text:"Important factor in substance abuse?", opts:["Whether substances used by family members","Rural/urban environment","Being a twin","Born in winter"], correct:0 },
+  { text:"Self-medication in substance abuse refers to?", opts:["Amelioration of distress through substance use","Doctors prescribing own drugs","Motive for using","Deciding drug of choice"], correct:0 },
+  { text:"Example of substance use disorder (SUD)?", opts:["All of these","Alcohol related","Caffeine related","Inhalant related"], correct:0 }
+];
+
+// ----- UNIT 2 (90 Questions) -----
+const RAW_UNIT2 = [
+  { text:"What is a hobby?", opts:["Activities which give us fun and joy","Gardening only","Activities making us serious","None"], correct:0 },
+  { text:"Which is an indoor hobby?", opts:["Reading books and music","Travelling","Stamp collecting and swimming","Trekking"], correct:0 },
+  { text:"What is philately?", opts:["Collecting and study of stamps","Study of non-collection","Study of ancient coins","None"], correct:0 },
+  { text:"Meaning of active?", opts:["Happiness","Arrogance","Ego","Evolve"], correct:0 },
+  { text:"Which is an outdoor hobby?", opts:["Gardening and travelling","Philately","Numismatics","Cooking"], correct:0 },
+  { text:"Synonym of sporty?", opts:["Hearty","Joy","Leisure","Sorrow"], correct:0 },
+  { text:"One who collects coins as hobby?", opts:["Numismatist","Philatelist","Ornithologist","Statistician"], correct:0 },
+  { text:"Person who loves books?", opts:["Bibliophile","Pluviophile","Cosmopolitan","Changeling"], correct:0 },
+  { text:"NUMISMATIST : COINS ::", opts:["Philatelist : Stamps","Jeweler : Jewels","Cartographer : Maps","Geneticist : Chromosomes"], correct:0 },
+  { text:"Person who pretends to have more knowledge?", opts:["Charlatan","Crook","Apotheosis","Renegade"], correct:0 },
+  { text:"A game which no one wins?", opts:["Draw","Tie","Loss","Toss"], correct:0 },
+  { text:"Activities people enjoy during leisure time?", opts:["Hobbies","Schools","Sports","Friends"], correct:0 },
+  { text:"State of being pleased or content?", opts:["Happy","Indoors","Outdoors","Alone"], correct:0 },
+  { text:"Use of skill and imagination to create?", opts:["Art","Music","Sports","School"], correct:0 },
+  { text:"Earnest Klein classified habits into?", opts:["Intentional and non-intentional","Compulsive and non-compulsive","Primary and secondary","Pressure and non-pressure"], correct:0 },
+  { text:"When hooked on a hobby, one realizes?", opts:["Integral part of life","More benefits","More enjoyable","Essential to learn skills"], correct:0 },
+  { text:"No matter the hobby, it should be?", opts:["A diversion and passion","Useful in long run","Improves circumstances","Followed till end"], correct:0 },
+  { text:"Journey of experiencing a hobby is?", opts:["Rewarding","Challenging","Demanding","Inspirational"], correct:0 },
+  { text:"Getting a hobby means short break from work that can?", opts:["Rejuvenate mind","Give peace of mind","Enhance skills","All of these"], correct:3 },
+  { text:"NOT a benefit of having a hobby?", opts:["Help manage planned time","Provide opportunity to socialize","Give opportunity to enhance life","Make more confident"], correct:0 },
+  { text:"If hobby gives you ______, you become more confident?", opts:["Sense of purpose","Confidence to move forward","Reason to develop","Skills for work"], correct:0 },
+  { text:"NOT a good habit?", opts:["Put sharp objects in eyes/ears","Avoid talking while eating","Use hanky when coughing","Cutting nails"], correct:0 },
+  { text:"Primary reason smoking is bad?", opts:["Kills cilia in respiratory tract","Inhibits hemoglobin","Destroys lung cells","Weakens breathing muscles"], correct:0 },
+  { text:"We should not ______ water?", opts:["Waste","Store","Use","Save"], correct:0 },
+  { text:"We should brush teeth ______ a day?", opts:["Two times","Four times","Five times","One time"], correct:0 },
+  { text:"We should take a bath?", opts:["Every day","One day","Once a week","Once a month"], correct:0 },
+  { text:"Keep books and clothes in ______ places?", opts:["Right","Dirty","Wrong","None"], correct:0 },
+  { text:"Throw waste into?", opts:["Dustbin","Outside","Room","Class"], correct:0 },
+  { text:"Keep house and class?", opts:["Clean","Dirty","Bad","All"], correct:0 },
+  { text:"Share ______ things?", opts:["Good","Bad","Dirty","None"], correct:0 },
+  { text:"Speak ______ to each other?", opts:["Politely","Rudely","Badly","None"], correct:0 },
+  { text:"Spend time with?", opts:["All of these","Grandparents","Siblings","Parents"], correct:0 },
+  { text:"Wash hands before and after ______ meal?", opts:["Every","Breakfast","Lunch","Dinner"], correct:0 },
+  { text:"Wear ______ uniform?", opts:["Clean","Dirty","Bad","None"], correct:0 },
+  { text:"Eat ______ food?", opts:["Healthy","Junk","Stale","Unhealthy"], correct:0 },
+  { text:"Have less ______ food?", opts:["Junk","Healthy","Vegetables","Fruits"], correct:0 },
+  { text:"Play and exercise ______ day?", opts:["Everyday","One day","Once a week","Once a month"], correct:0 },
+  { text:"Benefits of balanced diet?", opts:["All of these","Good health","Good mood/energy","Improved health"], correct:0 },
+  { text:"How many glasses of water daily?", opts:["At least 8","More than 12","1-3","Do not drink"], correct:0 },
+  { text:"Minimum hours of sleep daily?", opts:["8-10","5-7","3-5","1-2"], correct:0 },
+  { text:"Which is a healthy habit?", opts:["Cereal with milk and fruits for breakfast","Sleep 6 hours","Play video games nightly","Watch TV all night"], correct:0 },
+  { text:"Not a healthy eating practice?", opts:["Eat more fatty foods","Eat more fruits/veg","Eat more fiber","Don't eat in hurry"], correct:0 },
+  { text:"To prevent diseases you must?", opts:["Cover mouth when coughing/sneezing","Eat pizza daily","Use toilet paper","Sing in shower"], correct:0 },
+  { text:"First meal of the day?", opts:["Breakfast","Tea","Lunch","Dinner"], correct:0 },
+  { text:"What happens if you eat junk food?", opts:["Bad things to body","Eat more fruits/veg","Have healthy habit","Burgers taste better"], correct:0 },
+  { text:"What to do to be healthy?", opts:["Eat healthy food everyday","Sleep all day","Eat junk food","Smile"], correct:0 },
+  { text:"Which is a good habit?", opts:["Wash hands before/after eating","Wash hands before toilet","Brush teeth once a week","All"], correct:0 },
+  { text:"Which keeps bones/muscles strong?", opts:["Exercise","Brushing","Bathing","Eating"], correct:0 },
+  { text:"Touch electric points with?", opts:["Dry hands","Wet hands","Iron rod","Ice"], correct:0 },
+  { text:"What was Dia's mother reading on medicine bottle?", opts:["Expiry date","Doctor's name","Amount of medicine","Colour"], correct:0 },
+  { text:"First aid for minor cut?", opts:["Wash with water then antiseptic","Wash then cold cream","Remove then Band-Aid","Wash then ice pack"], correct:0 },
+  { text:"Which is a good habit?", opts:["Enter college bus in line","Get into moving bus","Keep hand outside","Push each other"], correct:0 },
+  { text:"'Lexicography' is associated with?", opts:["Compilation of dictionary","Ancient remains","Edicts","Decorative writing"], correct:0 },
+  { text:"A ______ requires specialized knowledge and academic preparation?", opts:["Profession","Hobby","Passion","Goal"], correct:0 },
+  { text:"What age group is most exposed to peer pressure?", opts:["Teenager","Toddler","Adult","Elder"], correct:0 },
+  { text:"How is peer pressure commonly spread?", opts:["Verbally and social media","Verbally only","US Mail","Social media only"], correct:0 },
+  { text:"Which solution to peer pressure was proposed?", opts:["Educate on consequences","Outlaw influences","Remove social media","Therapy"], correct:0 },
+  { text:"Due to peer pressure being a major issue, many ______ have been created?", opts:["Websites","Stores","Classrooms","Coffee stores"], correct:0 },
+  { text:"If someone repeatedly confronts you, what do you do?", opts:["Walk away","Accept","Fight","Steal their wallet"], correct:0 },
+  { text:"Main difference between implicit and explicit peer pressure?", opts:["Explicit is direct, implicit is indirect","Explicit only when yelled","Implicit is pressuring others","Implicit is self-pressure"], correct:0 },
+  { text:"What factor influences implicit peer pressure?", opts:["Social Influence","Internal Influence","Your Mood","The Weather"], correct:0 },
+  { text:"Best way to respond to peer pressure?", opts:["Be firm and say no, leave if needed","Ignore them","Yell at them","Succumb if not that bad"], correct:0 },
+  { text:"BEST way to refuse smoking or drugs?", opts:["Firmly say 'no'","Yell 'NO' and run","Have friends say no","Say you'll do it next time"], correct:0 },
+  { text:"BEST way to avoid negative peer pressure?", opts:["Hang out with friends who share your values","Hang out with people with bad reputations","Scream 'NO' and run","Be aggressive"], correct:0 },
+  { text:"Situations for negative peer pressure EXCEPT?", opts:["Studying in a group for a test","Drugs, alcohol, tobacco","Truancy and academic dishonesty","Sexual activity"], correct:0 },
+  { text:"NOT a benefit of positive peer pressure?", opts:["Added stress and pressure","Encouragement to try new things","Honest feedback","Exposure to new things"], correct:0 },
+  { text:"Peer pressure can influence all EXCEPT?", opts:["The food we are allergic to","The clothes we wear","The music we listen to","The food we eat"], correct:0 },
+  { text:"Example of peer pressure?", opts:["Friend wanting you to play despite doctor's advice","Assertively saying no to drink","Saying no to relative for car","Leaving party when someone brings cigarette"], correct:0 },
+  { text:"Main keys to managing stress?", opts:["All of these","Recognizing signs","Identifying sources","Identifying what we can/can't control"], correct:0 },
+  { text:"Moodiness, hostility, fearfulness are signs stress is affecting?", opts:["Emotions","Body","Mind","Behavior"], correct:0 },
+  { text:"Which causes stress?", opts:["All of these","Illness","Academic demands","Loss of family member"], correct:0 },
+  { text:"Taking care during stress EXCEPT?", opts:["Suppressing true feelings","Talking with someone","Down time","Emotional outlet"], correct:0 },
+  { text:"Basic sources of stress?", opts:["All of these","Social stressors","Physiological","Thoughts"], correct:0 },
+  { text:"Examples of environmental stressors?", opts:["All of these","Weather","Traffic","Substandard housing"], correct:0 },
+  { text:"Examples of social stressors?", opts:["All of these","Financial problems","Divorce","Loss of loved one"], correct:0 },
+  { text:"Examples of physiological stressors?", opts:["All of these","Menopause","Giving birth","Sleep disturbances"], correct:0 },
+  { text:"Characteristics of Positive Stress?", opts:["All of these","Improves performance","Feels exciting","Motivates"], correct:0 },
+  { text:"Characteristics of Negative Stress?", opts:["All of these","Causes anxiety","Feels unpleasant","Decreases performance"], correct:0 },
+  { text:"Which statement is true?", opts:["Negative stress perceived within coping","Positive stress is short-term","Negative stress can be short/long-term","Negative stress leads to mental/physical problems"], correct:3 },
+  { text:"Examples of negative stressors?", opts:["All of these","Unemployment","Legal problems","Divorce"], correct:0 },
+  { text:"Examples of positive stressors?", opts:["All of these","New job","Having a child","Buying a home"], correct:0 },
+  { text:"Physical symptoms of anxiety?", opts:["All of these","Racing heart","Sweaty palms","Flushed cheeks"], correct:0 },
+  { text:"Anxiety can cause which moods?", opts:["All of these","Irritable","Panicky","Anxious"], correct:0 },
+  { text:"Thoughts under negative stress?", opts:["You cannot cope","You can cope","Everything will get fine","You'll get help"], correct:0 },
+  { text:"Symptoms of stress categories?", opts:["All of these","Cognitive","Emotional","Physical"], correct:0 },
+  { text:"Which statement is true about stress symptoms?", opts:["Moodiness is emotional","Moodiness is cognitive","Poor judgment is emotional","Agitation is cognitive"], correct:0 },
+  { text:"True about behavioral symptoms of stress?", opts:["All of these","Eating more/less","Sleeping more/less","Isolating self"], correct:0 },
+  { text:"Aches, shallow breathing, sweating, frequent colds are?", opts:["Physical symptoms","Behavioral symptoms","Emotional symptoms","Cognitive symptoms"], correct:0 },
+  { text:"Who first described 'fight or flight response'?", opts:["Walter B. Cannon","Sigmund Freud","Atkinson Potter","Mrunal Sengupta"], correct:0 },
+  { text:"Optimal amount of stress that promotes health and growth?", opts:["Eustress","Mistress","Distress","Neostress"], correct:0 }
+];
+
+// ----- UNIT 3 (50 Questions) -----
+const RAW_UNIT3 = [
+  { text:"What is a characteristic of accelerated change in technology landscape?", opts:["Increased connectivity","Slower development","Reduced innovation","Minimal competition"], correct:0 },
+  { text:"Example of disruption caused by technological advancement?", opts:["Ride-sharing apps replacing taxis","Traditional business models","Longer device life cycles","More face-to-face communication"], correct:0 },
+  { text:"Why do shorter technology life cycles increase e-waste?", opts:["Frequent upgrades make devices obsolete","People store old devices","Decrease in production","Tech improvements reduce functionality"], correct:0 },
+  { text:"What drives high competition in technology markets?", opts:["Constant innovation","Reduced consumer demand","Limited innovation","Longer product release times"], correct:0 },
+  { text:"Company releasing new smartphone annually addresses which characteristic?", opts:["High competition","Reduced R&D","Increased e-waste","Longer life cycles"], correct:0 },
+  { text:"New gaming console making predecessor obsolete is example of?", opts:["Frequent upgrades","Economic pressure","Increased connectivity","Job transformation"], correct:0 },
+  { text:"How does rapid tech evolution impact job markets?", opts:["Creates new jobs, eliminates old ones","Limits demand for innovation","Stabilizes job roles","Reduces need for tech education"], correct:0 },
+  { text:"Best illustrates impact of consumer demand in changing tech landscape?", opts:["High demand for advanced AI","Reduction in device costs","Steady demand for old devices","Limited interest in upgrades"], correct:0 },
+  { text:"Which impact could most negatively affect environment?", opts:["Increased e-waste","Job transformation","Increased connectivity","Economic growth"], correct:0 },
+  { text:"Most important strategy for businesses to address shorter tech life cycles?", opts:["Continuous innovation and upgrades","Heavy customer service investment","Limit R&D","Reduce production"], correct:0 },
+  { text:"Why is it important to keep up with technological advances?", opts:["Remain competitive in job market","Avoid learning new skills","Increase traditional marketing","Maintain job roles without change"], correct:0 },
+  { text:"Example of career advancement through continuous learning?", opts:["Acquiring project management for leadership","Staying in one role","Transitioning to non-technical role","Learning language for satisfaction"], correct:0 },
+  { text:"How does learning digital marketing contribute to economic resilience?", opts:["Mitigates job loss risk from traditional marketing shifts","Helps avoid technological change","Limits flexibility","Reduces personal growth"], correct:0 },
+  { text:"Why is adaptability important in rapidly changing work environment?", opts:["Transition between roles/industries as needed","Specialize in outdated skills","Stay in single industry","Avoid switching roles"], correct:0 },
+  { text:"Marketing professional learning coding to transition to tech role is example of?", opts:["Adaptability","Personal growth","Job security","Economic resilience"], correct:0 },
+  { text:"Software engineer taking AI courses to keep up with innovation reflects?", opts:["Keeping up with technological advances","Reducing skill set","Career stagnation","Decreasing employability"], correct:0 },
+  { text:"Relationship between continuous learning and job security?", opts:["Learning helps mitigate job loss risk from automation","Learning focuses only on satisfaction","Learning reduces need for advancement","Learning decreases adaptability"], correct:0 },
+  { text:"Professional learning project management for leadership is prioritizing?", opts:["Career advancement","Economic resilience","Flexibility","Personal growth"], correct:0 },
+  { text:"Most important reason for continuous learning in ever-changing job market?", opts:["Ensure adaptability and job security","Avoid switching careers","Increase social interaction","Limit skill development"], correct:0 },
+  { text:"Learning new skills for self-improvement primarily focuses on?", opts:["Personal growth","Career advancement","Economic resilience","Avoiding innovation"], correct:0 },
+  { text:"First step in continuous learning?", opts:["Identify learning goals","Join professional networks","Seek feedback","Apply skills practically"], correct:0 },
+  { text:"Example of utilizing online resources for continuous learning?", opts:["Online course on Coursera","Joining mentoring program","Reading publications","Attending conference"], correct:0 },
+  { text:"Why is setting clear objectives important in continuous learning?", opts:["Determine which skills are needed and why","Limit practical application","Reduce need for feedback","Avoid networking"], correct:0 },
+  { text:"How can reading books/articles contribute to continuous learning?", opts:["Keeps updated on latest trends","Allows workshop participation","Avoids practical application","Replaces seminars"], correct:0 },
+  { text:"Professional joining LinkedIn AI group and seeking guidance is example of?", opts:["Joining professional networks","Practical application","Online resources","Setting learning goals"], correct:0 },
+  { text:"After learning web development, student creates personal website. This is example of?", opts:["Hands-on practice","Identifying goals","Seeking feedback","Attending workshops"], correct:0 },
+  { text:"Connection between practical application and continuous improvement?", opts:["Hands-on practice + feedback refines skills","Improvement replaces goal setting","Practice prevents improvement","Practice unnecessary if feedback provided"], correct:0 },
+  { text:"Attending seminar and reading journals afterward uses which two strategies?", opts:["Workshops + reading books/articles","Goal setting + networking","Online resources + reflection","Practice + feedback"], correct:0 },
+  { text:"Most effective strategy for keeping up with rapid technical field changes?", opts:["Reading latest publications","Setting broad non-specific goals","Avoiding workshops","Informal networking"], correct:0 },
+  { text:"Professional with clear objectives and seeking feedback is likely to?", opts:["Achieve targeted continuous improvement","Minimize practical application","Become over-reliant on online resources","Avoid professional events"], correct:0 },
+  { text:"What is teamwork?", opts:["Collaborative effort toward common goal","Independent effort","Avoiding collaboration","Sharing individual successes"], correct:0 },
+  { text:"Which skill is essential for clear exchange of ideas in a team?", opts:["Communication","Conflict resolution","Listening","Flexibility"], correct:0 },
+  { text:"Why is listening important in teamwork?", opts:["Understand and consider others' perspectives","Limits communication","Allows independent work","Reduces need for conflict resolution"], correct:0 },
+  { text:"How does flexibility contribute to teamwork?", opts:["Take on different roles as needed","Avoid changes","Enforce strict division","Eliminate task division"], correct:0 },
+  { text:"Team member suggesting solution no one considered is example of?", opts:["Innovation","Conflict resolution","Communication failure","Ignoring feedback"], correct:0 },
+  { text:"Project manager dividing tasks based on strengths improves team's?", opts:["Efficiency","Flexibility","Networking","Conflict management"], correct:0 },
+  { text:"Relationship between teamwork and networking for career success?", opts:["Teamwork encourages networking that expands opportunities","Networking allows isolation","Unrelated","Teamwork hinders relationships"], correct:0 },
+  { text:"How can conflict resolution contribute to team success?", opts:["Constructively address disagreements to maintain harmony","Discourage open discussions","Allow conflicts to persist","Avoid communication about disagreements"], correct:0 },
+  { text:"Most crucial skill for effective collaboration with frequent role/task changes?", opts:["Flexibility","Innovation","Conflict resolution","Networking"], correct:0 },
+  { text:"Team achieving goal more efficiently through shared knowledge best explains?", opts:["Shared knowledge + pooled efforts lead to effective goal achievement","Focus on independent work","Collaboration limits communication","Conflict resolution unnecessary"], correct:0 },
+  { text:"Which trait ensures responsibilities are consistently met in a team?", opts:["Reliability","Proactivity","Adaptability","Respect"], correct:0 },
+  { text:"What does adaptability in teamwork refer to?", opts:["Being flexible and open to changes","Taking initiative","Acknowledging contributions","Completing tasks on time"], correct:0 },
+  { text:"Why is respect important in teamwork?", opts:["Values contributions, fosters positive environment","Prevents idea contribution","Ensures deadlines","Limits collaboration"], correct:0 },
+  { text:"How does proactivity benefit a team?", opts:["Taking initiative and offering help without being asked","Focus only on own tasks","Limits communication","Wait for instructions"], correct:0 },
+  { text:"Team member helping colleague struggling with deadline is example of?", opts:["Proactivity","Adaptability","Conflict management","Reliability"], correct:0 },
+  { text:"Providing clear constructive feedback in team meeting is example of?", opts:["Effective communication","Respect","Continuous learning","Collaboration"], correct:0 },
+  { text:"Which two traits combined are likely to prevent delays in a team project?", opts:["Reliability and proactivity","Reliability and conflict management","Collaboration and continuous learning","Respect and adaptability"], correct:0 },
+  { text:"Listening actively during disagreement and finding compromise demonstrates?", opts:["Conflict management","Proactivity","Adaptability","Respect"], correct:0 },
+  { text:"Attending workshops to improve skills that help team progress establishes?", opts:["Continuous learning","Proactivity","Conflict resolution","Adaptability"], correct:0 },
+  { text:"Which combination most likely fosters productive team environment where all feel valued?", opts:["Respect and collaboration","Respect and conflict management","Reliability and proactivity","Proactivity and adaptability"], correct:0 }
+];
+
+// ============================================================
+// SHUFFLING LOGIC (randomizes option order per question)
+// ============================================================
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function createShuffledQuestion(rawQ) {
+  // Create array of indices [0,1,2,3] and shuffle
+  const indices = [0, 1, 2, 3];
+  shuffleArray(indices);
+  // Build new options array in shuffled order
+  const shuffledOptions = indices.map(i => rawQ.opts[i]);
+  // Find new index of the correct answer
+  const newCorrectIndex = indices.indexOf(rawQ.correct);
+  return {
+    text: rawQ.text,
+    options: shuffledOptions,
+    correct: newCorrectIndex
+  };
+}
+
+function shuffleAllUnits() {
+  const shuffledUnit1 = RAW_UNIT1.map(q => createShuffledQuestion(q));
+  const shuffledUnit2 = RAW_UNIT2.map(q => createShuffledQuestion(q));
+  const shuffledUnit3 = RAW_UNIT3.map(q => createShuffledQuestion(q));
+  return [shuffledUnit1, shuffledUnit2, shuffledUnit3];
+}
+
+// Initialize with shuffled questions
+let UNITS = shuffleAllUnits();
+let currentUnit = -1;
+let currentIndex = 0;
+let answers = UNITS.map(unit => Array(unit.length).fill(null));
+
+// Helper functions
+function toggleDark() {
+  document.body.classList.toggle('dark');
+  const btn = document.querySelector('button[onclick="toggleDark()"]');
+  btn.textContent = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
+
+function reshuffleAllQuestions() {
+  if (currentUnit !== -1) {
+    if (!confirm('⚠️ Reshuffling will reset all your progress for ALL units. Continue?')) return;
+  }
+  // Generate new shuffled versions
+  const newUnits = shuffleAllUnits();
+  // Replace global units
+  UNITS = newUnits;
+  // Reset answers
+  answers = UNITS.map(unit => Array(unit.length).fill(null));
+  // Reset current index
+  currentIndex = 0;
+  // Update totals display
+  updateTotalCounts();
+  updateScores();
+  // Re-render current unit if any, otherwise stay
+  if (currentUnit !== -1) {
+    renderQuestion();
+  } else {
+    const area = document.getElementById('q-area');
+    area.innerHTML = '<p class="placeholder">👆 Select a unit to begin practicing ALL MCQs.</p>';
+  }
+}
+
+function updateTotalCounts() {
+  for (let i = 0; i < UNITS.length; i++) {
+    document.getElementById(`t${i}`).innerText = UNITS[i].length;
+  }
+}
+
+function updateScores() {
+  for (let u = 0; u < UNITS.length; u++) {
+    let correct = 0;
+    let answered = 0;
+    for (let i = 0; i < UNITS[u].length; i++) {
+      if (answers[u][i] !== null) {
+        answered++;
+        if (answers[u][i].correct) correct++;
+      }
+    }
+    document.getElementById(`s${u}`).innerHTML = `${correct} / ${answered}`;
+  }
+}
+
+function resetUnit() {
+  if (currentUnit < 0) return;
+  answers[currentUnit] = Array(UNITS[currentUnit].length).fill(null);
+  currentIndex = 0;
+  updateScores();
+  renderQuestion();
+}
+
+function switchUnit(unitIdx) {
+  currentUnit = unitIdx;
+  currentIndex = 0;
+  document.querySelectorAll('.unit-btn').forEach((btn, i) => {
+    if (i === unitIdx) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const area = document.getElementById('q-area');
+  if (currentUnit < 0) {
+    area.innerHTML = '<p class="placeholder">👆 Select a unit to begin practicing ALL MCQs.</p>';
+    return;
+  }
+
+  const questions = UNITS[currentUnit];
+  const q = questions[currentIndex];
+  const existing = answers[currentUnit][currentIndex];
+  const total = questions.length;
+  const answeredCount = answers[currentUnit].filter(a => a !== null).length;
+  const progressPercent = ((currentIndex + 1) / total) * 100;
+
+  // Build navigation dots
+  let dotsHtml = '';
+  for (let i = 0; i < total; i++) {
+    const ans = answers[currentUnit][i];
+    let cls = 'q-nav-dot';
+    if (i === currentIndex) cls += ' current';
+    else if (ans) cls += ans.correct ? ' done-c' : ' done-w';
+    dotsHtml += `<div class="${cls}" onclick="goToQuestion(${i})">${i+1}</div>`;
+  }
+
+  // Build options (letters A-D based on current shuffled order)
+  let optionsHtml = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  for (let i = 0; i < q.options.length; i++) {
+    let optClass = 'opt';
+    if (existing !== null) {
+      if (i === q.correct) optClass += ' correct';
+      else if (i === existing.chosen && !existing.correct) optClass += ' wrong';
+    }
+    optionsHtml += `
+      <button class="${optClass}" onclick="pickAnswer(${i})" ${existing !== null ? 'disabled' : ''}>
+        <span class="opt-letter">${letters[i]}</span>
+        <span>${escapeHtml(q.options[i])}</span>
+      </button>
+    `;
+  }
+
+  // Feedback
+  let feedbackHtml = '';
+  if (existing !== null) {
+    if (existing.correct) {
+      feedbackHtml = `<div class="feedback correct show">✓ Correct!</div>`;
+    } else {
+      feedbackHtml = `<div class="feedback wrong show">✗ Incorrect -- Correct answer: ${letters[q.correct]}. ${escapeHtml(q.options[q.correct])}</div>`;
+    }
+  }
+
+  const html = `
+    <div class="progress-row">
+      <span>${currentUnit === 0 ? 'Unit 1 – Introduction to Life Skills, Time Management, Health & Addictions' : (currentUnit === 1 ? 'Unit 2 – Hobbies, Habits, Peer Pressure & Stress Management' : 'Unit 3 – Continuous Learning & Teamwork')}</span>
+      <span>Q ${currentIndex+1} / ${total} &nbsp;·&nbsp; ${answeredCount} answered</span>
+    </div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>
+    <div class="q-nav">${dotsHtml}</div>
+    <div class="q-number">Question ${currentIndex + 1}</div>
+    <div class="q-text">${escapeHtml(q.text)}</div>
+    <div class="options">${optionsHtml}</div>
+    ${feedbackHtml}
+    <div class="nav-row">
+      <button onclick="navigate(-1)" ${currentIndex === 0 ? 'disabled' : ''}>← Previous</button>
+      <button onclick="navigate(1)" class="nav-btn-primary" ${currentIndex === total-1 ? 'disabled' : ''}>Next →</button>
+    </div>
+  `;
+  area.innerHTML = html;
+}
+
+function pickAnswer(selectedIdx) {
+  if (currentUnit < 0) return;
+  if (answers[currentUnit][currentIndex] !== null) return;
+  const q = UNITS[currentUnit][currentIndex];
+  const isCorrect = (selectedIdx === q.correct);
+  answers[currentUnit][currentIndex] = { chosen: selectedIdx, correct: isCorrect };
+  updateScores();
+  renderQuestion();
+}
+
+function navigate(delta) {
+  if (currentUnit < 0) return;
+  const newIdx = currentIndex + delta;
+  if (newIdx >= 0 && newIdx < UNITS[currentUnit].length) {
+    currentIndex = newIdx;
+    renderQuestion();
+  }
+}
+
+function goToQuestion(idx) {
+  if (currentUnit < 0) return;
+  if (idx >= 0 && idx < UNITS[currentUnit].length) {
+    currentIndex = idx;
+    renderQuestion();
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
+// Initialize
+updateTotalCounts();
+updateScores();
+</script>
+</body>
+</html>
